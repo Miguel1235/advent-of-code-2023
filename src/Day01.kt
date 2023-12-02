@@ -19,9 +19,9 @@ private fun text2Numbers(word: String): String {
 }
 
 
-val part1 = { words: List<String> -> words.fold(0) { acc, word -> acc + (findFirstNumber(word) + findFirstNumber(word.reversed())).toInt() } }
+private val part1 = { words: List<String> -> words.fold(0) { acc, word -> acc + (findFirstNumber(word) + findFirstNumber(word.reversed())).toInt() } }
 
-val part2 = { words: List<String> -> part1(words.map { word -> text2Numbers(word) }) }
+private val part2 = { words: List<String> -> part1(words.map { word -> text2Numbers(word) }) }
 
 fun main() {
     val testInput = readInput("Day01_test")
