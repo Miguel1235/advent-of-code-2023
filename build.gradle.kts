@@ -31,10 +31,10 @@ private fun part2(input: List<String>): Int {
 }
 
 fun main() {
-    val testInput = readInput("${currDay}_test")
+    val testInput = readInput("Day${currDay}_test")
     check(part1(testInput) == 0)
     
-    val input = readInput("$currDay")
+    val input = readInput("Day$currDay")
     part1(input).println()
     part2(input).println()
 }
