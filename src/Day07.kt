@@ -77,16 +77,16 @@ private val allParts =
     { hands: List<Hand> -> calculateTotalWinnings(hands.sortedWith { h1, h2 -> compareHands(h1, h2) }) }
 
 private val improveHands = {hands: List<Hand> -> hands.map {hand ->
-        val jCount = hand.cards.count { it == 'J' }
+        val jokers = hand.cards.count { it == 'J' }
         val improvedCard = when (hand.name) {
             CardNames.HIGH_CARD -> CardNames.ONE_PAIR
             CardNames.ONE_PAIR -> CardNames.THREE_OF_A_KIND
-            CardNames.TWO_PAIR -> if (jCount == 1) CardNames.FULL_HOUSE else CardNames.FOUR_OF_A_KIND
+            CardNames.TWO_PAIR -> if (jokers == 1) CardNames.FULL_HOUSE else CardNames.FOUR_OF_A_KIND
             CardNames.THREE_OF_A_KIND -> CardNames.FOUR_OF_A_KIND
             else -> CardNames.FIVE_OF_A_KIND
         }
 
-        if (jCount == 0) hand else Hand(improvedCard, hand.cards.replace('J', '1'), hand.bet)
+        if (jokers == 0) hand else Hand(improvedCard, hand.cards.replace('J', '1'), hand.bet)
     }
 }
 
