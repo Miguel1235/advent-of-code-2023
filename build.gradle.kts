@@ -21,6 +21,17 @@ tasks {
                     prevDay.toInt()
                 }
             val currDay = String.format("%02d", prevDay + 1)
+
+            // val outputText: String = ByteArrayOutputStream().use { outputStream ->
+            //     exec {
+            //         commandLine("aocd $currDay 2023")
+            //         standardOutput = outputStream
+            //     }
+            //     outputStream.toString()
+            // }
+
+            // File("$projectDir/src", "Day$currDay.txt").writeText(outputText)
+
             File("$projectDir/src", "Day$currDay.kt").writeText(
                 """
 private fun part1(input: List<String>): Int {
