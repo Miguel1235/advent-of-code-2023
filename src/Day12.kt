@@ -4,23 +4,14 @@ private fun part1(input: List<String>): Int {
     return input.fold(0) {acc, row -> acc+calculateArrangement(row) }
 }
 
-private fun obtainConditions(row: List<String>): String {
-    return row[0]
-}
-
-private fun obtainGroups(row: List<String>): List<Int> {
-    return row[1].split(",").map {it.toInt()}
-}
-
 private fun calculateArrangement(row: String): Int {
     val rowSplit = row.split(" ")
     var total = 0
 
-    val conditions = obtainConditions(rowSplit)
-    val groups = obtainGroups(rowSplit)
+    val conditions = rowSplit[0]
+    val groups = rowSplit[1].split(",").map {it.toInt()}
 
-    val possibleResults = binaryCount(conditions)
-    for(possibleR in possibleResults) {
+    for(possibleR in binaryCount(conditions)) {
         val groupCurrent = currentGroups(possibleR)
         if(groupCurrent.size != groups.size) continue
         if(groupCurrent == groups) total++
@@ -28,19 +19,13 @@ private fun calculateArrangement(row: String): Int {
     return total
 }
 
-private fun binaryCount(input: String): List<String> {
-    var newStr = input
-    val maxNumber = 2.0.pow(input.count {it == '?'}.toDouble()) -1
-
+private fun binaryCount(input: String): Sequence<String> {
     val replacedI = input.replace("?", "x")
-    val regex = Regex("""x""")
-
-    val matches = regex.findAll(replacedI).toList()
-    val indexR = matches.map { it.range.first }
+    val indexR = Regex("""x""").findAll(replacedI).toList().map { it.range.first }
 
     val possiblesStrings: MutableList<String> = mutableListOf()
-
-    for(i in 0..maxNumber.toInt()) {
+    var newStr = input
+    for(i in 0.. (2.0.pow(input.count {it == '?'}.toDouble()) -1).toInt()) {
         val values2Replace = Integer.toBinaryString(i).padStart(input.count {it == '?'},'.').replace('1', '#').replace('0','.').toList()
         for(r in indexR.indices) {
             val index = indexR[r]
@@ -49,7 +34,7 @@ private fun binaryCount(input: String): List<String> {
         }
         possiblesStrings.add(newStr)
     }
-    return possiblesStrings
+    return possiblesStrings.asSequence()
 }
 
 private fun currentGroups(line: String): List<Int> {
@@ -85,13 +70,10 @@ private fun part2(input: List<String>): Int {
 
 fun main() {
     val testInput = readInput("Day12_test")
-    // check(part1(testInput) == 21)
-    part1(testInput).println()
+    val input = readInput("Day12")
+    check(part1(testInput) == 21)
+    check(part1(input) == 7506)
 
-    // part2(testInput)
-    
-    // val input = readInput("Day12")
-    // check(part1(input) == 7506)
-
+    // part2(testInput).println()
     // part2(input).println()
 }
