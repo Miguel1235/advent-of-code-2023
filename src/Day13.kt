@@ -25,14 +25,7 @@ private fun obtainCols(data: List<String>): List<String> {
     return cols
 }
 
-private fun part1(input: List<String>): Int {
-    val mirrors = obtainMirrors(input)
-    var total = 0
-    for (mirror in mirrors) {
-        total += checkMirror(mirror.cols, true) + checkMirror(mirror.rows, false)
-    }
-    return total
-}
+private val part1 = { input: List<String> -> obtainMirrors(input).fold(0) {acc, mirror -> acc+checkMirror(mirror.cols, true) + checkMirror(mirror.rows, false) } }
 
 private fun isMirrorAt(input: List<String>, index: Int): Boolean {
     var m1 = index
@@ -72,6 +65,6 @@ fun main() {
     check(part1(testInput) == 405)
 
     val input = readInput("Day13")
-    part1(input).println() // 32371
+    check(part1(input) == 32371)
     // part2(input).println()
 }
