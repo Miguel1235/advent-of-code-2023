@@ -42,7 +42,7 @@ private class PoweredGrid {
         }
     }
 
-    fun splitBean() {
+    fun splitBean(draw: Char) {
         val total = activeBeams.size
         for(i in 0..<total) {
             val beam = activeBeams[i]
@@ -83,7 +83,7 @@ private fun part1(grid: List<String>): Int {
 
                 '|' -> {
                     println("Vertical splitter")
-                    poweredGrid.splitBean()
+                    poweredGrid.splitBean('|')
                 }
 
                 else -> {
