@@ -1,24 +1,24 @@
 private fun obtainNewSequence(sequence: List<Int>): List<Int> {
-    val newSequence: List<Int> = mutableListOf()
+    val newSequence: MutableList<Int> = mutableListOf()
     for (i in 1..<sequence.size) {
         val curr = sequence[i]
         val prev = sequence[i - 1]
-        newSequence.addLast(curr - prev)
+        newSequence.add(curr - prev)
     }
     return newSequence
 }
 
-private val string2IntList = { input: String -> input.split(" ").map { it.toInt() } }
+private val string2IntList = { input: String -> input.split(" ").map { it.toInt() }.toMutableList() }
 
 private val isZeroSequence = { sequence: List<Int> -> sequence.filter { it == 0 }.size == sequence.size }
 
-private fun obtainSequences(history: String): List<List<Int>> {
+private fun obtainSequences(history: String): MutableList<MutableList<Int>> {
     val sequence = string2IntList(history)
-    val sequences: List<List<Int>> = mutableListOf(sequence)
+    val sequences: MutableList<MutableList<Int>> = mutableListOf(sequence)
 
     do {
-        val newSeq = obtainNewSequence(sequences.last())
-        sequences.addLast(newSeq)
+        val newSeq = obtainNewSequence(sequences.last()).toMutableList()
+        sequences.add(newSeq)
     } while (!isZeroSequence(newSeq))
     return sequences
 }
@@ -27,7 +27,7 @@ private val predictNextHistoryValue =
     { sequences: List<List<Int>> -> sequences.fold(0) { acc: Int, sq: List<Int> -> acc + sq.last() } }
 
 
-private fun predictValPart2(sequences: List<List<Int>>): Int {
+private fun predictValPart2(sequences: MutableList<MutableList<Int>>): Int {
     val sp = fillPlaceHolders(sequences)
     for (i in sp.size - 1 downTo 1) {
         val prev = sp[i]
@@ -38,16 +38,16 @@ private fun predictValPart2(sequences: List<List<Int>>): Int {
     return sp.first().first()
 }
 
-private fun fillPlaceHolders(sequences: List<List<Int>>): List<MutableList<Int>> {
+private fun fillPlaceHolders(sequences: MutableList<MutableList<Int>>): List<MutableList<Int>> {
     val sequenceWithPlaceHolders: MutableList<MutableList<Int>> = mutableListOf()
     for (sequence in sequences) {
         if (isZeroSequence(sequence)) {
-            sequence.addFirst(0)
-            sequenceWithPlaceHolders.addLast(sequence.toMutableList())
+            sequence.add(0,0)
+            sequenceWithPlaceHolders.add(sequence.toMutableList())
             continue
         }
-        sequence.addFirst(999)
-        sequenceWithPlaceHolders.addLast(sequence.toMutableList())
+        sequence.add(0,999)
+        sequenceWithPlaceHolders.add(sequence.toMutableList())
     }
     return sequenceWithPlaceHolders
 }

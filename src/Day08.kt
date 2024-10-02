@@ -51,9 +51,9 @@ fun findLCMS(numbers: List<Long>): Long {
 private fun part2(nodes: Map<String, Pair<String, String>>, instructions: Sequence<Char>): Long {
     val startingNodes = nodes.filter { n -> n.key.endsWith('A') }
 
-    val steps: List<Long> = mutableListOf()
+    val steps: MutableList<Long> = mutableListOf()
     for (startNode in startingNodes) {
-        steps.addLast(part1(nodes, instructions, startNode.key, true).toLong())
+        steps.add(part1(nodes, instructions, startNode.key, true).toLong())
     }
     return findLCMS(steps)
 }

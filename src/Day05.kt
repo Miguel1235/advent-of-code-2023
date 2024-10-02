@@ -4,24 +4,24 @@ private data class Mapper(val name: String, val ranges: List<Range>)
 private data class Range(val ds: Long, val de: Long, val ss: Long, val se: Long, val range: Long, val diff: Long)
 
 private fun obtainMappers(input: List<String>): List<Mapper> {
-    var ranges: List<Range> = mutableListOf()
+    var ranges: MutableList<Range> = mutableListOf()
     var cat: String = input[2]
-    val mappers: List<Mapper> = mutableListOf()
+    val mappers: MutableList<Mapper> = mutableListOf()
     for (i in 2 + 1..<input.size) {
         val line = input[i]
         if (line.contains("seeds") || line.isEmpty()) continue
         if (line.contains("-to-")) {
-            mappers.addLast(Mapper(cat, ranges))
+            mappers.add(Mapper(cat, ranges))
             cat = line
             ranges = mutableListOf()
         } else {
             val (ds, ss, r) = line.split(" ").map { it.toLong() }
             val de = ds + r - 1
             val se = ss + r - 1
-            ranges.addLast(Range(ds, de, ss, se, r, ds - ss))
+            ranges.add(Range(ds, de, ss, se, r, ds - ss))
         }
     }
-    mappers.addLast(Mapper(cat, ranges))
+    mappers.add(Mapper(cat, ranges))
     return mappers
 }
 
@@ -49,12 +49,12 @@ private fun part1(input: List<String>): Long {
 
 private fun obtainAllSeeds(input: List<String>): List<Sequence<Long>> {
     val line = input[0].split(":")[1].trim().split(" ").map { it.toLong() }
-    val seeds: List<Sequence<Long>> = mutableListOf()
+    val seeds: MutableList<Sequence<Long>> = mutableListOf()
 
     for (i in line.indices step 2) {
         val startSeed = line[i]
         val items = line[i + 1]
-        seeds.addLast(generateSequence(startSeed) { if (it < startSeed + items-1) it + 1 else null })
+        seeds.add(generateSequence(startSeed) { if (it < startSeed + items-1) it + 1 else null })
     }
     return seeds
 }

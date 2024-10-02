@@ -7,13 +7,13 @@ private class Card(val id: Int, val winningNumbers: List<Int>, val ownNumbers: L
     }
     fun calculateCopies(cards: List<Card>): Int {
         var copies = 0
-        val stack: List<Card> = mutableListOf(this)
+        val stack: MutableList<Card> = mutableListOf(this)
         while (stack.isNotEmpty()) {
             copies++
             val card = stack.removeLast()
             val copies2Make = card.ownWinnerNumbers.size
             for (i in card.id + 1..card.id + copies2Make) {
-                stack.addLast(cards[i - 1])
+                stack.add(cards[i-1])
             }
         }
         return copies
