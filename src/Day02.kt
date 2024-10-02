@@ -30,11 +30,11 @@ data class Cubes(var blue: Int, var red: Int, var green: Int) {
 private fun makeGame(line: String): Game {
     val colorsRegex = Regex("""(\d+) (red|green|blue)""")
 
-    val cubes: MutableList<Cubes> = mutableListOf()
-    val inputBags = line.split(":")[1].split(";")
-    for (ibag in inputBags) {
+    val cubes = mutableListOf<Cubes>()
+    val sets = line.split(":")[1].split(";")
+    for (set in sets) {
         val bagCount = mutableMapOf("green" to 0, "red" to 0, "blue" to 0)
-        val results = colorsRegex.findAll(ibag)
+        val results = colorsRegex.findAll(set)
         for (r in results) {
             val color = r.groupValues[2]
             val count = r.groupValues[1].toInt()
