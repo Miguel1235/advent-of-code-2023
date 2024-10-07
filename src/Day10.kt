@@ -11,7 +11,21 @@ private fun findStatingPoint(input: List<List<Char>>): Pair<Int, Int> {
     return Pair(0,0)
 }
 
-private fun discoverNeighbour(input: List<List<Char>>, pipes: Map<Char, Pipe>, startingPoint: Pair<Int, Int>): Int {
+private fun discoverNeighbour(input: List<List<Char>>, startingPoint: Pair<Int, Int>): List<String> {
+    val north = listOf('7','|', 'F')
+    val west = listOf('-', 'F', 'L')
+    val east = listOf('-', 'J', '7')
+    val south = listOf('J', 'L', '|')
+
+    val pipes = mapOf(
+        '|' to Pipe('|', north = north, south = south),
+        '-' to Pipe('-', east = east, west = west),
+        'L' to Pipe('L', east = east, north = north),
+        'J' to Pipe('J', west = west, north = north),
+        '7' to Pipe('7', south = south, west = west),
+        'F' to Pipe('F', south = south, east = east),
+    )
+
     val (r,c) = startingPoint
     var currentPipe = pipes[input[r][c]]!!
     var currRPosition = r
@@ -19,10 +33,6 @@ private fun discoverNeighbour(input: List<List<Char>>, pipes: Map<Char, Pipe>, s
     val alreadyCounted: MutableList<String> = mutableListOf("$r:$c")
 
     while (true) {
-//        println("****************")
-//        println("Pipe: $currentPipe - Starting point: ${input[currRPosition][currCPosition]} -$currRPosition-$currCPosition")
-//        println("Alreay counted: $alreadyCounted")
-
         val nbs = mapOf(
             "${currRPosition - 1}:${currCPosition}:north" to pipes[input.getOrNull(currRPosition - 1)?.getOrNull(currCPosition)], // top
             "${currRPosition + 1}:${currCPosition}:south" to pipes[input.getOrNull(currRPosition + 1)?.getOrNull(currCPosition)], // bottom
@@ -31,27 +41,16 @@ private fun discoverNeighbour(input: List<List<Char>>, pipes: Map<Char, Pipe>, s
         )
             .filter { it.value != null }
             .filter { !alreadyCounted.contains(it.key.split(":").take(2).joinToString(":")) }
-
-//        println("Possible nbs: $nbs")
-
-        // TODO: FIX THIS THING BECAUSE OF NORTH AND SOUTH, IT DEPENDS ON WHERE IT IS - SEE F & J EXAMPLE POSITION
         val nextPipe = nbs.filter {
-//            println("Checking if $it is a valid pipe for the current pipe: $currentPipe")
-//            println(currentPipe.south?.contains(it.value!!.name))
             currentPipe.east?.contains(it.value!!.name) == true && it.key.split(":")[2] == "east" ||
             currentPipe.west?.contains(it.value!!.name) == true && it.key.split(":")[2] == "west"||
             currentPipe.south?.contains(it.value!!.name) == true && it.key.split(":")[2] == "south"||
             currentPipe.north?.contains(it.value!!.name) == true && it.key.split(":")[2] == "north"
         }
-//        println("All next pipes $nextPipe")
-
         if(nextPipe.isEmpty()) {
-//            println("We finished the loop!!!")
             break
         }
-
         currentPipe = nextPipe.values.first()!!
-
 
         val keys = nextPipe.keys.first().split(":")
         currRPosition = keys[0].toInt()
@@ -59,8 +58,8 @@ private fun discoverNeighbour(input: List<List<Char>>, pipes: Map<Char, Pipe>, s
 
         alreadyCounted.add("$currRPosition:$currCPosition")
     }
-    println("The path is: $alreadyCounted - with farthest point from the start is ${alreadyCounted.size/2}")
-    return alreadyCounted.size/2
+//    println("The path is: $alreadyCounted - with farthest point from the start is ${alreadyCounted.size/2}")
+    return alreadyCounted
 }
 
 data class Pipe(
@@ -76,27 +75,54 @@ private fun parseInput(input: List<String>): MutableList<MutableList<Char>> {
 }
 
 private fun part1(input: MutableList<MutableList<Char>>): Int {
-    val north = listOf('7','|', 'F')
-    val west = listOf('-', 'F', 'L')
-    val east = listOf('-', 'J', '7')
-    val south = listOf('J', 'L', '|')
-
-    val pipes = mapOf(
-        '|' to Pipe('|', north = north, south = south),
-        '-' to Pipe('-', east = east, west = west),
-        'L' to Pipe('L', east = east, north = north),
-        'J' to Pipe('J', west = west, north = north),
-        '7' to Pipe('7', south = south, west = west),
-        'F' to Pipe('F', south = south, east = east),
-    )
-
     val startingPoint = findStatingPoint(input)
     input[startingPoint.first][startingPoint.second] = 'F' // We should write some code to automatically detect where it should start
-    return discoverNeighbour(input, pipes, startingPoint)
+    return discoverNeighbour(input, startingPoint).size/2
 }
 
-private fun part2(input: List<String>): Int {
-    return 0
+private fun isInside(edges: List<Pair<Int, Int>>, testPoint: Pair<Int, Int>): Boolean {
+    // https://www.youtube.com/watch?v=RSXM9bgqxJM
+
+    var count = 0
+    val (xp, yp) = testPoint
+
+    for(i in edges.indices) {
+        val (x1, y1) = edges[i]
+        val (x2, y2) = edges[(i + 1) % edges.size]
+
+        if(yp < y1 == yp < y2) {
+            // the test point is outside the edge
+            continue
+        }
+        if(xp < (x1+ ((yp-y1)/(y2-y1))*(x2-x1))) {
+            count++
+        }
+    }
+    return count % 2 == 1
+}
+
+private fun part2(input: MutableList<MutableList<Char>>): Int {
+    val startingPoint = findStatingPoint(input)
+    input[startingPoint.first][startingPoint.second] = 'F' // We should write some code to automatically detect where it should start
+
+    val polygon = discoverNeighbour(input, startingPoint).map {
+        val (r, c) = it.split(":")
+        Pair(r.toInt(), c.toInt())
+    }
+
+    var count = 0
+    for(i in input.indices) {
+        for(j in input[i].indices) {
+            val testPoint = Pair(i,j)
+            if(isInside(polygon, testPoint)) {
+                if(!polygon.contains(testPoint)) {
+                    count++
+                }
+            }
+        }
+    }
+
+    return count
 }
 
 fun main() {
@@ -105,4 +131,9 @@ fun main() {
 
     val input = readInput("Day10")
     check(part1(parseInput(input)) == 7173)
+
+    val testInput2 = readInput("Day10_test2")
+    check(part2(parseInput(testInput2))== 4)
+
+    check(part2(parseInput(input)) ==291)
 }
