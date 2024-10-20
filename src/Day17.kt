@@ -41,20 +41,14 @@ class Graph {
 
     fun shortestPath(source: Node, target: Node) {
         val dist = mutableMapOf<Node, Int>()
-        val prev = mutableMapOf<Node, Node?>()
+        val prev = mutableMapOf<Node, Pair<Node?, Direction>?>()
         val q = findDistinctNodes()
 
         q.forEach { v ->
             dist[v] = Integer.MAX_VALUE
             prev[v] = null
         }
-
         dist[source] = 0
-
-
-
-        var currentCount = 1
-        var currentDirection = Direction.TOP
 
         while (q.isNotEmpty()) {
             val u = q.minByOrNull { dist[it] ?: 0 }
@@ -66,44 +60,33 @@ class Graph {
             val fe = edges
                 .filter { it.source == u }
 
-
-
-
-
             for (edge in fe) {
 
+//                val count = prev.values.filterNotNull().takeLast(3).map {it.second}.groupingBy { it }.eachCount()
 
-                println(currentCount)
+                val m = prev.values.filterNotNull().groupBy { it.first?.name ?: "" }.map { (_, group) -> group.last() }
+//                println(m)
+                val count = m.takeLast(3).map {it.second}.groupingBy { it }.eachCount()
 
-                if (currentCount > 3) {
-                    break
+                println(count)
+
+                if(count.containsKey(edge.direction) && count[edge.direction]!! >= 3) {
+                        println("cannot go more down")
+                        continue
                 }
+
                 val v = edge.destination
                 val alt = (dist[u] ?: 0) + edge.weight
                 if (alt < (dist[v] ?: 0)) {
                     dist[v] = alt
-                    prev[v] = u
-                    println("${edge.direction} == ${currentDirection}")
-
-                    if(
-                        (edge.direction == Direction.LEFT && currentDirection == Direction.RIGHT) ||
-                        (edge.direction == Direction.RIGHT && currentDirection == Direction.LEFT) ||
-                        (edge.direction == Direction.TOP && currentDirection == Direction.BOTTOM) ||
-                        (edge.direction == Direction.BOTTOM && currentDirection == Direction.TOP) ||
-                        (edge.direction == currentDirection)
-                    ) {
-                        currentCount++
-                    } else {
-                        currentCount = 1
-                        currentDirection = edge.direction
-                    }
+                    prev[v] = Pair(u, edge.direction)
                 }
             }
         }
 
         val r = dist.filter { it.key == target }
         println("The result is $r")
-        println(prev)
+//        println(prev)
     }
 
     private fun findDistinctNodes(): MutableSet<Node> {
